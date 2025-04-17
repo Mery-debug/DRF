@@ -7,7 +7,6 @@ class Course(models.Model):
     preview = models.ImageField(upload_to="media/img/", blank=True, null=True, verbose_name="Превью")
     description = models.TextField(verbose_name="Описание")
 
-
     def __str__(self):
         return f"{self.name} {self.description}"
 
@@ -21,7 +20,6 @@ class Lesson(models.Model):
     description = models.TextField()
     preview = models.ImageField(upload_to="media/img/", blank=True, null=True, verbose_name="Превью")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Курс")
-
 
     def __str__(self):
         return f"{self.name} {self.description}"
