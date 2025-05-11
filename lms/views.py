@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from lms.models import Course, Lesson
+from lms.paginators import Pagination
 from lms.serializers import CourseSerialize, LessonSerialize
 from users.permissions import IsManager
 
@@ -12,6 +13,7 @@ from users.permissions import IsManager
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerialize
     queryset = Course.objects.all()
+    pagination_class = Pagination
 
     def perform_create(self, serializer):
         course = serializer.save()
@@ -33,6 +35,12 @@ class CourseViewSet(viewsets.ModelViewSet):
         )
         return Response(serializer.data)
 
+    def get(self, request):
+        queryset = Course.objects.all()
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = CourseSerialize(paginated_queryset, many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 @permission_classes([IsAuthenticated])
 class LessonCreateAPIView(generics.CreateAPIView):
@@ -48,6 +56,16 @@ class LessonCreateAPIView(generics.CreateAPIView):
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerialize
     queryset = Lesson.objects.all()
+    pagination_class = Pagination
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 @permission_classes([IsAuthenticated])
