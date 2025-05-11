@@ -25,7 +25,6 @@ class CourseViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-
 @permission_classes([IsAuthenticated])
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerialize
