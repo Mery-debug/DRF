@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from lms.models import Course, Lesson
+from lms.validators import ValidatorURL
+from users.models import Membership
 
 
 class LessonSerialize(serializers.ModelSerializer):
@@ -8,6 +10,7 @@ class LessonSerialize(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
+        validators = [ValidatorURL(field='description')]
 
 
 class CourseSerialize(serializers.ModelSerializer):
@@ -17,9 +20,17 @@ class CourseSerialize(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
+        validators = [ValidatorURL(field='description')]
 
     def get_lesson_count(self, instance):
         return instance.lesson_set.count()
+
+
+class MembershipSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Membership
+        fields = '__all__'
 
 
 

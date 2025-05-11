@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from lms.models import Course, Lesson
 from lms.serializers import CourseSerialize, LessonSerialize
@@ -23,6 +24,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         elif self.action in ['update', 'retrieve']:
             self.permission_classes = (IsManager,)
         return super().get_permissions()
+
+    def retrieve(self, request, *args, **kwargs):
+        course = self.get_object()
+        serializer = CourseSerialize(
+            course,
+            context={'request': request, 'course_id': course.id}
+        )
+        return Response(serializer.data)
 
 
 @permission_classes([IsAuthenticated])
