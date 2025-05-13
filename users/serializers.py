@@ -14,12 +14,13 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ("id", "email", "phone_number", "city", "img", "is_subscribed",)
+        fields = ("id", "email", "phone_number", "city", "img", "is_subscribed", "password",)
 
-    def get_is_subscribed(self):
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
         course_id = self.context.get('course_id')
 

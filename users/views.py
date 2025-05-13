@@ -18,10 +18,10 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = TokenSerializer
 
 
-@permission_classes([AllowAny])
 class UsersCreateAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         user = serializer.save()

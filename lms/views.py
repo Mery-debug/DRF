@@ -1,4 +1,5 @@
 from rest_framework import viewsets, generics
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -42,9 +43,10 @@ class CourseViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
 
-@permission_classes([IsAuthenticated])
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerialize
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         lesson = serializer.save()

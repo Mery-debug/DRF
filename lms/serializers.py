@@ -10,6 +10,7 @@ class LessonSerialize(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
+        read_only_fields = ['owner']
         validators = [ValidatorURL(field='description')]
 
 

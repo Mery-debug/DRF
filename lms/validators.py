@@ -13,4 +13,5 @@ class ValidatorURL:
         dct = dict(value).get(self.field)
         if not bool(reg.match(dct)):
             raise ValidationError("You are trying to add an invalid URL")
+        return value
 
