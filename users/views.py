@@ -1,10 +1,9 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import permission_classes, api_view
+from rest_framework.decorators import permission_classes
 from rest_framework.filters import OrderingFilter
-from rest_framework import viewsets, generics, permissions
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from lms.models import Course
 from lms.serializers import MembershipSerializer
@@ -78,7 +77,4 @@ class MembershipCreateAPIView(generics.CreateAPIView):
             message = 'подписка добавлена'
         return Response({"message": message})
 
-
-class MembershipDestroyAPIView(generics.DestroyAPIView):
-    queryset = Membership.objects.all()
 

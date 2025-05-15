@@ -22,9 +22,13 @@ class testCRUD(APITestCase):
             'course': self.course.id
         }
         response = self.client.post(url, data=data)
-        print(response.json())
         self.assertEqual(
             response.status_code,
             status.HTTP_200_OK
+        )
+        self.assertEqual(
+            response.json(),
+            {'message': 'подписка удалена'}
+
         )
 

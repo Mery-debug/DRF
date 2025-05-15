@@ -5,18 +5,26 @@ from lms.validators import ValidatorURL
 from users.models import Membership
 
 
+class MembershipSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Membership
+        fields = '__all__'
+
+
 class LessonSerialize(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
         fields = '__all__'
         read_only_fields = ['owner']
-        validators = [ValidatorURL(field='description')]
+        validators = [ValidatorURL(field='video_url')]
 
 
 class CourseSerialize(serializers.ModelSerializer):
     lesson_count = serializers.SerializerMethodField()
     lesson = LessonSerialize(source="lesson_set", many=True, required=False)
+    membership = MembershipSerializer(source="membership_set", many=True, required=False)
 
     class Meta:
         model = Course
@@ -27,11 +35,6 @@ class CourseSerialize(serializers.ModelSerializer):
         return instance.lesson_set.count()
 
 
-class MembershipSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Membership
-        fields = '__all__'
 
 
 

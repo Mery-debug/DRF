@@ -11,6 +11,8 @@ class ValidatorURL:
     def __call__(self, value):
         reg = re.compile(r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)(?:[\w-]+)(?:\S+)?")
         dct = dict(value).get(self.field)
+        if dct is None:
+            return value
         if not bool(reg.match(dct)):
             raise ValidationError("You are trying to add an invalid URL")
         return value
