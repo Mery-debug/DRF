@@ -6,8 +6,8 @@ from users.views import (
     UsersListAPIView,
     UsersCreateAPIView,
     UsersDestroyAPIView,
-    UsersRetrieveAPIView,
-    UsersUpdateAPIView)
+    UsersUpdateAPIView,
+    MembershipCreateAPIView)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -24,5 +24,5 @@ urlpatterns = [
     path('register/', UsersCreateAPIView.as_view(), name='register'),
     path('update/', UsersUpdateAPIView.as_view(), name='user_update'),
     path('delete/', UsersDestroyAPIView.as_view(), name='user_delete'),
-
+    path('create_member/', MembershipCreateAPIView.as_view(), name='create_member'),
 ]
