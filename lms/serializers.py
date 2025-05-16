@@ -24,7 +24,7 @@ class LessonSerialize(serializers.ModelSerializer):
 class CourseSerialize(serializers.ModelSerializer):
     lesson_count = serializers.SerializerMethodField()
     lesson = LessonSerialize(source="lesson_set", many=True, required=False)
-    membership = MembershipSerializer(source="membership_set", many=True, required=False)
+    membership = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -33,6 +33,10 @@ class CourseSerialize(serializers.ModelSerializer):
 
     def get_lesson_count(self, instance):
         return instance.lesson_set.count()
+
+    def get_membership(self, course):
+        user = self.context["request"].user
+        return Membership.objects.filter(course=course, user=user).exists()
 
 
 
