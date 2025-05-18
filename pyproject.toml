@@ -11,6 +11,14 @@ djangorestframework-jsonapi = "^7.1.0"
 django-filter = "^25.1"
 dotenv = "^0.9.9"
 djangorestframework = "^3.16.0"
+django = "^5.2.1"
+django-cors-headers = "^4.7.0"
+psycopg2 = "^2.9.10"
+coreapi = "2.3.3"
+django-celery-beat = "^2.8.1"
+django-coreapi = "^2.3.0"
+drf-yasg = "^1.21.10"
+pillow = "^11.2.1"
 
 
 [build-system]
