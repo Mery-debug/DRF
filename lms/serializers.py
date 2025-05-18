@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from lms.models import Course, Lesson
 from lms.validators import ValidatorURL
-from users.models import Membership
+from users.models import Membership, Payment
 
 
 class MembershipSerializer(serializers.ModelSerializer):
@@ -39,6 +39,9 @@ class CourseSerialize(serializers.ModelSerializer):
         return Membership.objects.filter(course=course, user=user).exists()
 
 
-
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['user', 'pay_course', 'pay_lesson', 'amount', 'variation_cost']
 
 

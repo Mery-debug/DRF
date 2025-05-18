@@ -19,6 +19,8 @@ django-celery-beat = "^2.8.1"
 django-coreapi = "^2.3.0"
 drf-yasg = "^1.21.10"
 pillow = "^11.2.1"
+requests = "^2.32.3"
+stripe = "^12.1.0"
 
 
 [build-system]

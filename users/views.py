@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import permission_classes
 from rest_framework.filters import OrderingFilter
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from lms.models import Course
 from lms.serializers import MembershipSerializer
+from lms.services import create_price, create_stripe_product, create_stripe
 from users.models import Payment, User, Membership
 from users.serializers import PaymentSerializer, UserSerializer, TokenSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -49,6 +50,31 @@ class UsersUpdateAPIView(generics.UpdateAPIView):
 @permission_classes([IsAuthenticated])
 class UsersDestroyAPIView(generics.DestroyAPIView):
     queryset = User.objects.all()
+
+
+class PaymentsCreateAPIView(generics.CreateAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        if not payment.pay_course and not payment.pay_lesson:
+            raise serializers.ValidationError("Необходимо указать курс или урок")
+        if payment.pay_course:
+            product_name = payment.pay_course.name
+        else:
+            product_name = payment.pay_lesson.name
+        if not payment.total_cost or payment.total_cost <= 0:
+            raise serializers.ValidationError("Укажите корректную сумму оплаты")
+        try:
+            product = create_stripe_product(product_name)
+            price = create_price(product.id, payment.total_cost)
+            session = create_stripe(price.id)
+            payment.payment_session_id = session.id
+            payment.payment_link = session.url
+            payment.save()
+        except Exception as e:
+            raise serializers.ValidationError(f"Ошибка при создании платежа: {str(e)}")
 
 
 class PaymentListAPIView(generics.ListAPIView):
