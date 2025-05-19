@@ -65,7 +65,7 @@ class PaymentsCreateAPIView(generics.CreateAPIView):
             price = create_price(product.id, payment.total_cost)
             session = create_stripe(price.id)
         except Exception:
-            raise ServiceUnavailable()
+            raise ServiceUnavailable(detail='Stripe service unavailable')
         payment.payment_session_id = session.id
         payment.payment_link = session.url
         payment.save()
