@@ -9,19 +9,3 @@ class ServiceUnavailable(APIException):
     default_detail = 'Service temporarily unavailable, try again later.'
     default_code = 'service_unavailable'
 
-
-def custom_exception_handler(exc, context):
-    """Кастомный обработчик исключений"""
-    response = exception_handler(exc, context)
-
-    if isinstance(exc, (DatabaseError, TimeoutError)):
-        return Response(
-            {
-                "error": "Service Unavailable",
-                "detail": str(exc),
-                "code": "service_unavailable"
-            },
-            status=503
-        )
-
-    return response

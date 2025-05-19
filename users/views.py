@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from lms.models import Course
 from lms.serializers import MembershipSerializer
 from lms.services import create_price, create_stripe_product, create_stripe
-from users.api_errors import ServiceUnavailable, custom_exception_handler
+from users.api_errors import ServiceUnavailable
 from users.models import Payment, User, Membership
 from users.serializers import PaymentSerializer, UserSerializer, TokenSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -56,17 +56,20 @@ class UsersDestroyAPIView(generics.DestroyAPIView):
 class PaymentsCreateAPIView(generics.CreateAPIView):
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
-    exception_handler = custom_exception_handler
 
     def perform_create(self, serializer):
         payment = serializer.save(user=self.request.user)
         product = payment.pay_course or payment.pay_lesson
-        product = create_stripe_product(product.name)
-        price = create_price(product.id, payment.total_cost)
-        session = create_stripe(price.id)
+        try:
+            product = create_stripe_product(product.name)
+            price = create_price(product.id, payment.total_cost)
+            session = create_stripe(price.id)
+        except Exception:
+            raise ServiceUnavailable()
         payment.payment_session_id = session.id
         payment.payment_link = session.url
         payment.save()
+
 
 
 class PaymentListAPIView(generics.ListAPIView):

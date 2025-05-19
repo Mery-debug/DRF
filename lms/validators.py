@@ -1,5 +1,6 @@
 import re
 
+from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 
@@ -16,4 +17,5 @@ class ValidatorURL:
         if not bool(reg.match(dct)):
             raise ValidationError("You are trying to add an invalid URL")
         return value
+
 
