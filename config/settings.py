@@ -114,7 +114,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-api_key = os.getenv('API_KEY')
+STRIPE_API_KEY = os.getenv('API_KEY')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

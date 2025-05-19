@@ -44,4 +44,13 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = ['user', 'pay_course', 'pay_lesson', 'amount', 'variation_cost']
 
+    def validate_data_pay(self):
+        payment = self.save(user=self.context["request"].user)
+        if not payment.pay_course and not payment.pay_lesson:
+            raise serializers.ValidationError("Необходимо указать курс или урок")
+
+    def validate_data_total_coast(self):
+        payment = self.save(user=self.context["request"].user)
+        if not payment.total_cost or payment.total_cost <= 0:
+            raise serializers.ValidationError("Укажите корректную сумму оплаты")
 

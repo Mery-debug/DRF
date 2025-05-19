@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from lms.models import Course
 from lms.serializers import MembershipSerializer
 from lms.services import create_price, create_stripe_product, create_stripe
+from users.api_errors import ServiceUnavailable
 from users.models import Payment, User, Membership
 from users.serializers import PaymentSerializer, UserSerializer, TokenSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -58,23 +59,16 @@ class PaymentsCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         payment = serializer.save(user=self.request.user)
-        if not payment.pay_course and not payment.pay_lesson:
-            raise serializers.ValidationError("Необходимо указать курс или урок")
-        if payment.pay_course:
-            product_name = payment.pay_course.name
-        else:
-            product_name = payment.pay_lesson.name
-        if not payment.total_cost or payment.total_cost <= 0:
-            raise serializers.ValidationError("Укажите корректную сумму оплаты")
+        product = payment.pay_course or payment.pay_lesson
         try:
-            product = create_stripe_product(product_name)
+            product = create_stripe_product(product.name)
             price = create_price(product.id, payment.total_cost)
             session = create_stripe(price.id)
             payment.payment_session_id = session.id
             payment.payment_link = session.url
             payment.save()
-        except Exception as e:
-            raise serializers.ValidationError(f"Ошибка при создании платежа: {str(e)}")
+        except Exception:
+            raise ServiceUnavailable()
 
 
 class PaymentListAPIView(generics.ListAPIView):
@@ -102,5 +96,3 @@ class MembershipCreateAPIView(generics.CreateAPIView):
             Membership.objects.create(user=user, course=course_item)
             message = 'подписка добавлена'
         return Response({"message": message})
-
-
