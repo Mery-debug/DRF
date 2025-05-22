@@ -1,12 +1,14 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import permission_classes
 from rest_framework.filters import OrderingFilter
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from lms.models import Course
 from lms.serializers import MembershipSerializer
+from lms.services import create_price, create_stripe_product, create_stripe
+from users.api_errors import ServiceUnavailable
 from users.models import Payment, User, Membership
 from users.serializers import PaymentSerializer, UserSerializer, TokenSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -51,6 +53,25 @@ class UsersDestroyAPIView(generics.DestroyAPIView):
     queryset = User.objects.all()
 
 
+class PaymentsCreateAPIView(generics.CreateAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        product = payment.pay_course or payment.pay_lesson
+        try:
+            product = create_stripe_product(product.name)
+            price = create_price(product.id, payment.total_cost)
+            session = create_stripe(price.id)
+        except Exception:
+            raise ServiceUnavailable(detail='Stripe service unavailable')
+        payment.payment_session_id = session.id
+        payment.payment_link = session.url
+        payment.save()
+
+
+
 class PaymentListAPIView(generics.ListAPIView):
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
@@ -76,5 +97,3 @@ class MembershipCreateAPIView(generics.CreateAPIView):
             Membership.objects.create(user=user, course=course_item)
             message = 'подписка добавлена'
         return Response({"message": message})
-
-

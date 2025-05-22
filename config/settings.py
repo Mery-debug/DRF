@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     "users",
     "lms",
     'rest_framework_simplejwt',
+    'drf_yasg',
+    'corsheaders',
 
 ]
 
@@ -45,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -111,7 +114,14 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+STRIPE_API_KEY = os.getenv('API_KEY')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8000',
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
