@@ -1,12 +1,17 @@
+from datetime import timedelta
+
 from rest_framework import viewsets, generics
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.utils import timezone
 
 from lms.models import Course, Lesson
 from lms.paginators import Pagination
-from lms.serializers import CourseSerialize, LessonSerialize
+from lms.serializers import CourseSerialize, LessonSerialize, MembershipSerializer
+from lms.tasks import send_email
+from users.models import Membership
 from users.permissions import IsManager
 
 
@@ -35,6 +40,17 @@ class CourseViewSet(viewsets.ModelViewSet):
             context={'request': request, 'course_id': course.id}
         )
         return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        now = timezone.now()
+        member = Membership.objects.filter(course=instance)
+        if member:
+            if instance.last_update < (now - timedelta(hours=4)):
+                course_name = instance.name
+                for mem in member:
+                    send_email.delay(course_name, mem.user.email)
+
 
     def get(self, request):
         queryset = Course.objects.all()

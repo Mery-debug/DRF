@@ -22,6 +22,8 @@ pillow = "^11.2.1"
 requests = "^2.32.3"
 stripe = "^12.1.0"
 djangorestframework-simplejwt = "^5.5.0"
+celery = "^5.5.2"
+eventlet = "^0.40.0"
 
 
 [build-system]
