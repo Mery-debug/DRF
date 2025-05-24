@@ -2,13 +2,13 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
-from celery import Celery
+import celery
 
 # Установка переменной окружения для настроек проекта
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'PythonProject3.settings')
 
 # Создание экземпляра объекта Celery
-app = Celery('config')
+app = celery.Celery('config')
 
 # Загрузка настроек из файла Django
 app.config_from_object('django.conf:settings', namespace='CELERY')
