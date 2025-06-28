@@ -65,6 +65,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    image: PythonProject2/celery_beat
 
 volumes:
   postgres_data:
